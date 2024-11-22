@@ -92,6 +92,11 @@ app.get('/delete-task/:taskid', (req, res) => {
             })
     })
 })
+app.get('/delete-tasks', (req,res) => {
+    const data = JSON.stringify([],null, 2)
+    writeFile ('./tasks.json', data)
+    res.redirect('/')
+})
 
 app.listen(3001, () =>{
     console.log('Server started at http://localhost:3001')
