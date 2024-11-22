@@ -1,5 +1,9 @@
 [
   {
+    "id": 0,
+    "task": "Tasks"
+  },
+  {
     "id": 1,
     "task": "Study HTML"
   },
@@ -10,13 +14,5 @@
   {
     "id": 3,
     "task": "Study JS"
-  },
-  {
-    "id": 4,
-    "task": "Study OOP"
-  },
-  {
-    "id": 5,
-    "task": "Study FS"
   }
 ]
