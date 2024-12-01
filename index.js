@@ -9,9 +9,9 @@ app.set('views', path.join(__dirname, 'views'))
 
 const readFile = (filename) => {
     return new Promise((resolve,reject) => {
-        fs.readFile(filename, 'utf-8', (err,data) => {
-            if (err) {
-                console.error(err);
+        fs.readFile(filename, 'utf-8', (error,data) => {
+            if (error) {
+                console.error(error);
                 return;
             }  
             const tasks = JSON.parse(data)
@@ -21,23 +21,24 @@ const readFile = (filename) => {
 }
 const writeFile = (filename, data) => {
     return new Promise((resolve, reject) => {
-        fs.writeFile(filename, data, 'utf-8', err => {
-            if (err) {
-                console.error(err);
+        fs.writeFile(filename, data, 'utf-8', error => {
+            if (error) {
+                console.error(error);
                 return;
             }
             resolve(true)
-        });
+        })
     })
 }
 app.get('/', (req,res) => {
-    readFile ('./tasks.json')
-    .then(tasks => {
-    res.render('index', {
+    const editTaskId = parseInt(req.query.editTaskId) || null; 
+    readFile('./tasks.json').then(tasks => {
+        res.render('index', {
         tasks: tasks,
-        error: null
-        })
-    })
+        error: null,
+        editTaskId: editTaskId 
+        });
+    });
 })
 
 app.use(express.urlencoded({extended:true}))
@@ -53,38 +54,25 @@ app.post('/', (req, res) => {
                 error: error
             })
         })
-    } else
-    // task lists data from file
+    } else {
     readFile('./tasks.json',)
         .then((tasks) => {
-            // Add new task
-            // Create new ID automatically
             let index
             if (tasks.length === 0 ){
                 index = 0
             } else {
                 index = tasks [tasks.length - 1].id + 1
             }
-            // Create Task Object
             const newTask = {
                 "id":index,
                 "task": req.body.task
             }
-            console.log(newTask)
             tasks.push(newTask)
-            console.log(tasks)
-            data = JSON.stringify(tasks,null, 2)
-            console.log(data)
-            fs.writeFile ('tasks.json',data,err => {
-                if (err) {
-                    console.error(err);
-                    return
-                }else {
-                    console.log("saved")
-                }
-                res.redirect('/')
+            data = JSON.stringify(tasks, null, 2)
+            writeFile ('./tasks.json', data)
+            res.redirect('/')
             })
-        } )  
+        } 
     })
 app.get('/delete-task/:taskid', (req, res) => {
     let deletedTaskId = parseInt (req.params.taskid)
@@ -96,21 +84,38 @@ app.get('/delete-task/:taskid', (req, res) => {
                 }
             })
             data = JSON.stringify(tasks, null, 2)
-            fs.writeFile ('./tasks.json', data, 'utf-8', err => {
-                if (err) {
-                    console.error(err)
-                    return;
-                }
-                // redirect to / to see result
+            writeFile ('./tasks.json', data)
                 res.redirect('/')
             })
     })
-})
+
 app.get('/delete-tasks', (req,res) => {
-    const data = JSON.stringify([],null, 2)
+    data = JSON.stringify([],null, 2)
     writeFile ('./tasks.json', data)
     res.redirect('/')
 })
+app.post('/edit-task/:taskid', (req, res) => {
+    const taskId = parseInt(req.params.taskid);
+    const updatedTaskName = req.body.task.trim();
+
+    if (updatedTaskName.length === 0) {
+        return res.redirect(`/edit-task/${taskId}`);
+    }
+
+    readFile('./tasks.json').then(tasks => {
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+            task.task = updatedTaskName;
+            const data = JSON.stringify(tasks, null, 2);
+            writeFile('./tasks.json', data).then(() => {
+                res.redirect('/');
+            });
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
 
 app.listen(3001, () =>{
     console.log('Server started at http://localhost:3001')

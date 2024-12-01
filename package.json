@@ -4,7 +4,7 @@
   "description": "Simple project with UI, HTTP POST and Get queries, FS",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "nodemon express.js"
   },
   "keywords": [
     "web",

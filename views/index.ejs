@@ -33,13 +33,29 @@
               </div>
                 </div>
                 <div class="card-action">
-                    <ul class="collection">
-                        <% tasks.forEach(task => {  %>
-                        <li class="collection-item"><%= task.task %>
-                          <a href="delete-task/<%= task.id %>" class="secondary-content"> <i class="material-icons">delete</i></a></li>
-                        <% }) %>
-                        
-                      </ul>
+                  <ul class="collection">
+                    <% tasks.forEach(task => { %>
+                    <li class="collection-item">
+                        <% if (task.id === editTaskId) { %>
+                            <form method="post" action="/edit-task/<%= task.id %>">
+                                <div class="input-field inline">
+                                    <input type="text" name="task" value="<%= task.task %>" required>
+                                </div>
+                                <button type="submit" class="btn-small">Save</button>
+                                <a href="/" class="btn-small grey">Cancel</a>
+                            </form>
+                        <% } else { %>
+                            <%= task.task %>
+                            <a href="delete-task/<%= task.id %>" class="secondary-content">
+                                <i class="material-icons">delete</i>
+                            </a>
+                            <a href="/?editTaskId=<%= task.id %>" class="secondary-content">
+                                <i class="material-icons">create</i>
+                            </a>
+                        <% } %>
+                    </li>
+                    <% }) %>
+                </ul>
                       <a href="/delete-tasks" class="btn">Clear all</a>
                 </div>
               </div>
